@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<plasterManifest schemaVersion="1.1" templateType="Project" xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1">
+
+  <metadata>
+    <name>PSModuleTemplate</name>
+    <id>c46134d6-23ac-4f6f-8770-29a7c51f03b1</id>
+    <version>0.1.0</version>
+    <title>Héctor's Custom Plaster Template for PS Modules</title>
+    <description>Build faster modules with this PS Module Template</description>
+    <author>Héctor Andrade</author>
+    <tags>Module</tags>
+  </metadata>
+
+  <parameters>
+    <parameter name="ModuleName" type="text" prompt="Enter module's name" />
+    <parameter name="ModuleDescription" type="text" prompt="Enter a brief module description" />
+    <parameter name="ModuleVersion" type="text" prompt="Enter module version number" default='0.0.1' />
+    <parameter name="ModuleCompanyName" type="text" prompt="Enter company name" default='N/A' />
+    <parameter name="ModuleAuthor" type="user-fullname" prompt="Enter author name" default='Héctor Andrade'/>
+    <parameter name="ModuleEmail" type="user-email" prompt="Enter e-mail" default="andrad_h@hotmail.com"/>
+
+    <parameter name="ModulePowerShellVersion" type="choice" store="text" prompt="Minimum PowerShell version" default="1">
+      <choice label="&amp;5.1" help="Minimum Windows PowerShell version required is 5.1" value="5.1" />
+      <choice label="&amp;7.0" help="Minimum PowerShell version required is 7.0" value="7.0" />
+    </parameter>
+
+    <parameter name="ModuleFolders" type="multichoice" prompt="Which folders should be created in this module project?" default='0,3'>
+      <choice label="&amp;Help" help="Creates a en-US folder within the module root for about_help files." value="Help" />
+      <choice label="&amp;Classes" help="Creates a Classes folder within the module root for .cs files." value="Classes" />
+      <choice label="&amp;Binaries" help="Create a binaries folder within the module root for binary/*.dll files." value="Binaries" />
+      <choice label="&amp;Examples" help="Create an examples folder within the module root" value="Scripts" />
+    </parameter>
+
+    <parameter name="ModuleFunctionName" type="text" prompt="Name your first PowerShell function" default='Get-HelloWorld' />
+
+    <parameter name='Editor' type='choice' prompt='Select a editor for editor integration (or None):' default='1' store='text' >
+      <choice label='&amp;None' help="No editor specified." value="None"/>
+      <choice label='Visual Studio &amp;Code' help="Your editor is Visual Studio Code." value="VSCode"/>
+    </parameter>
+
+  </parameters>
+
+  <content>
+    <newModuleManifest destination='$PLASTER_PARAM_ModuleName\Src\$PLASTER_PARAM_ModuleName.psd1'
+      author='$PLASTER_PARAM_ModuleAuthor'
+      companyName='$PLASTER_PARAM_ModuleCompanyName'
+      description='$PLASTER_PARAM_ModuleDesc'
+      moduleVersion='$PLASTER_PARAM_ModuleVersion'
+      rootModule='$PLASTER_PARAM_ModuleName.psm1'
+      encoding='UTF8'
+      openInEditor='true'
+      powerShellVersion='$PLASTER_PARAM_ModulePowerShellVersion'/>
+
+    <templateFile source='Src\template.psm1' destination='$PLASTER_PARAM_ModuleName\Src\$PLASTER_PARAM_ModuleName.psm1'/>
+
+    <message>Building your PowerShell Module, please wait...</message>
+    <message> Creating folder and file structure for module: $PLASTER_PARAM_ModuleName </message>
+
+    <file destination='$PLASTER_PARAM_ModuleName\Src\Src\Public\' source='' />
+    <templateFile source='Src\function.ps1' destination='$PLASTER_PARAM_ModuleName\Src\Src\Public\$PLASTER_PARAM_ModuleFunctionName.ps1' />
+    <file destination='$PLASTER_PARAM_ModuleName\Src\Src\Private\' source='' />
+    <templateFile source='.gitkeep' destination='$PLASTER_PARAM_ModuleName\Src\Src\Private\.gitkeep' />
+
+    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Help"' destination='$PLASTER_PARAM_ModuleName\Src\en-US\' source='' />
+    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Help"' source='Src\about_template.help.txt.ps1' destination='$PLASTER_PARAM_ModuleName\Src\en-US\about_$PLASTER_PARAM_ModuleName.help.txt' />
+    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Classes"' destination='$PLASTER_PARAM_ModuleName\Src\Classes\' source='' />
+    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Classes"' source='Src\template.cs.ps1' destination='$PLASTER_PARAM_ModuleName\Src\Classes\$PLASTER_PARAM_ModuleName.cs.ps1' />
+    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Binaries"' destination='$PLASTER_PARAM_ModuleName\Src\Binaries\' source='' />
+    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Binaries"' source='.gitkeep' destination='$PLASTER_PARAM_ModuleName\Src\Binaries\.gitkeep' />
+    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Examples"' destination='$PLASTER_PARAM_ModuleName\Src\Examples\' source='' />
+    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Manifests"' source='.gitkeep' destination='$PLASTER_PARAM_ModuleName\Src\Config\.gitkeep' />
+
+    <templateFile source='ReadMe.md' destination='$PLASTER_PARAM_ModuleName\ReadMe.md' />
+
+    <message> Building pester tests for: $PLASTER_PARAM_ModuleName </message>
+    <file destination='$PLASTER_PARAM_ModuleName\tests\' source='' />
+    <templateFile source='Test\Manifest.Tests.ps1' destination='$PLASTER_PARAM_ModuleName\tests\Manifest.Tests.ps1'/>
+
+    <message> Building editor workspace settings for: $PLASTER_PARAM_Editor </message>
+    <file condition="($PLASTER_PARAM_Editor -eq 'VSCode')"
+      source='VSCode\settings.json'
+      destination='$PLASTER_PARAM_ModuleName\.vscode\settings.json' />
+
+    <message> Creating VSCode files </message>
+    <file condition="($PLASTER_PARAM_Editor -eq 'VSCode')"
+      source='VSCode\tasks.json'
+      destination='$PLASTER_PARAM_ModuleName\.vscode\tasks.json' />
+
+    <message> Verifying a minimum version of Pester (3.4.0) is installed. </message>
+    <requireModule name="Pester" condition="$PLASTER_PARAM_ProjectPester -eq 'Yes'" minimumVersion="3.4.0"
+        message="Without Pester, you will not be able to run the provided Pester test to validate your module manifest file.`nWithout version 3.4.0, VS Code will not display Pester warnings and errors in the Problems panel."/>
+
+  </content>
+</plasterManifest>

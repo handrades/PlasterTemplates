@@ -1,0 +1,7 @@
+{
+    "files.trimTrailingWhitespace": true,
+    "powershell.codeFormatting.openBraceOnSameLine": false,
+    "powershell.codeFormatting.newLineAfterCloseBrace": true,
+    "powershell.codeFormatting.whitespaceBeforeOpenBrace": false,
+    "powershell.codeFormatting.alignPropertyValuePairs": false
+}
