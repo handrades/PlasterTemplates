@@ -6,19 +6,21 @@ function $PLASTER_PARAM_ModuleFunctionName {
     [CmdletBinding()]
     param (
         #Enter computer name or IP address
+        [Parameter(Mandatory=$true,
+            Position=0,
+            ValueFromPipelineByPropertyName=$true)]
         [string[]]$ComputerName
     )
 
     begin {
 
-        $OnlineComputers = @()
-        $OfflineComputers = @()
+        [System.Collections.ArrayList]$OnlineComputers = @()
+        [System.Collections.ArrayList]$OfflineComputers = @()
         foreach ($Computer in $ComputerName) {
             if (Test-Connection -ComputerName $Computer -Count 1 -Quiet -ErrorAction SilentlyContinue) {
-                $OnlineComputers += $Computer
-            }
-            Else {
-                $OfflineComputers += $Computer
+                $OnlineComputers.Add($Computer)
+            } Else {
+                $OfflineComputers.Add($Computer)
             }
         }
 
