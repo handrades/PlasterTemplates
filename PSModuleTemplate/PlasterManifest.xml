@@ -13,8 +13,8 @@
 
   <parameters>
     <parameter name="ModuleName" type="text" prompt="Enter module's name" />
-    <parameter name="ModuleDescription" type="text" prompt="Enter a brief module description" />
-    <parameter name="ModuleVersion" type="text" prompt="Enter module version number" default='0.0.1' />
+    <parameter name="ModuleDesc" type="text" prompt="Enter a brief module description" />
+    <parameter name="ModuleVersion" type="text" prompt="Enter module version number" default='0.1.0' />
     <parameter name="ModuleCompanyName" type="text" prompt="Enter company name" default='N/A' />
     <parameter name="ModuleAuthor" type="user-fullname" prompt="Enter author name" default='Héctor Andrade'/>
     <parameter name="ModuleEmail" type="user-email" prompt="Enter e-mail" default="andrad_h@hotmail.com"/>
@@ -71,6 +71,7 @@
     <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Manifests"' source='.gitkeep' destination='$PLASTER_PARAM_ModuleName\Src\Config\.gitkeep' />
 
     <templateFile source='ReadMe.md' destination='$PLASTER_PARAM_ModuleName\ReadMe.md' />
+    <templateFile source='build.ps1' destination='$PLASTER_PARAM_ModuleName\build.ps1' />
 
     <message> Building pester tests for: $PLASTER_PARAM_ModuleName </message>
     <file destination='$PLASTER_PARAM_ModuleName\tests\' source='' />
@@ -86,9 +87,9 @@
       source='VSCode\tasks.json'
       destination='$PLASTER_PARAM_ModuleName\.vscode\tasks.json' />
 
-    <message> Verifying a minimum version of Pester (3.4.0) is installed. </message>
-    <requireModule name="Pester" condition="$PLASTER_PARAM_ProjectPester -eq 'Yes'" minimumVersion="3.4.0"
-        message="Without Pester, you will not be able to run the provided Pester test to validate your module manifest file.`nWithout version 3.4.0, VS Code will not display Pester warnings and errors in the Problems panel."/>
+    <message> Verifying a minimum version of Pester (5.0.0) is installed. </message>
+    <requireModule name="Pester" condition="$PLASTER_PARAM_ProjectPester -eq 'Yes'" minimumVersion="5.0.0"
+        message="Without Pester, you will not be able to run the provided Pester test to validate your module manifest file.`nWithout version 5.0.0, VS Code will not display Pester warnings and errors in the Problems panel."/>
 
   </content>
 </plasterManifest>
