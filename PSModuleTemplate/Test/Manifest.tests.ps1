@@ -4,10 +4,10 @@ BeforeAll {
 	$root = Split-Path -Path $here -Parent
 
 	$modulePath = Join-Path -Path $root -ChildPath ..
-	$moduleName = (Get-Item -Path "$modulePath\Src\*.psd1").BaseName
-	$moduleManifest = Join-Path -Path $modulePath -ChildPath "Src\$moduleName.psd1"
-	$functionsPublicPath = Join-Path -Path $modulePath -ChildPath 'Src\Src\Public'
-	$functionsPrivatePath = Join-Path -Path $modulePath -ChildPath 'Src\Src\Private'
+	$moduleName = (Get-Item -Path "$modulePath\Module\*.psd1").BaseName
+	$moduleManifest = Join-Path -Path $modulePath -ChildPath "Module\$moduleName.psd1"
+	$functionsPublicPath = Join-Path -Path $modulePath -ChildPath 'Module\Src\Public'
+	$functionsPrivatePath = Join-Path -Path $modulePath -ChildPath 'Module\Src\Private'
 	$functionsPublic = Get-ChildItem -Path $functionsPublicPath -Filter *.ps1
 	$functionsAll = Get-ChildItem -Path $functionsPublicPath, $functionsPrivatePath -Exclude .gitkeep
 

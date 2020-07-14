@@ -16,8 +16,7 @@
     <parameter name="ModuleDesc" type="text" prompt="Enter a brief module description" />
     <parameter name="ModuleVersion" type="text" prompt="Enter module version number" default='0.1.0' />
     <parameter name="ModuleCompanyName" type="text" prompt="Enter company name" default='N/A' />
-    <parameter name="ModuleAuthor" type="user-fullname" prompt="Enter author name" default='Héctor Andrade'/>
-    <parameter name="ModuleEmail" type="user-email" prompt="Enter e-mail" default="andrad_h@hotmail.com"/>
+    <parameter name="ModuleAuthor" type="user-fullname" prompt="Enter author name" />
 
     <parameter name="ModulePowerShellVersion" type="choice" store="text" prompt="Minimum PowerShell version" default="1">
       <choice label="&amp;5.1" help="Minimum Windows PowerShell version required is 5.1" value="5.1" />
@@ -28,7 +27,7 @@
       <choice label="&amp;Help" help="Creates a en-US folder within the module root for about_help files." value="Help" />
       <choice label="&amp;Classes" help="Creates a Classes folder within the module root for .cs files." value="Classes" />
       <choice label="&amp;Binaries" help="Create a binaries folder within the module root for binary/*.dll files." value="Binaries" />
-      <choice label="&amp;Examples" help="Create an examples folder within the module root" value="Scripts" />
+      <choice label="&amp;Examples" help="Create an examples folder within the module root" value="Examples" />
     </parameter>
 
     <parameter name="ModuleFunctionName" type="text" prompt="Name your first PowerShell function" default='Get-HelloWorld' />
@@ -41,7 +40,7 @@
   </parameters>
 
   <content>
-    <newModuleManifest destination='$PLASTER_PARAM_ModuleName\Src\$PLASTER_PARAM_ModuleName.psd1'
+    <newModuleManifest destination='$PLASTER_PARAM_ModuleName\Module\$PLASTER_PARAM_ModuleName.psd1'
       author='$PLASTER_PARAM_ModuleAuthor'
       companyName='$PLASTER_PARAM_ModuleCompanyName'
       description='$PLASTER_PARAM_ModuleDesc'
@@ -51,31 +50,31 @@
       openInEditor='true'
       powerShellVersion='$PLASTER_PARAM_ModulePowerShellVersion'/>
 
-    <templateFile source='Src\template.psm1' destination='$PLASTER_PARAM_ModuleName\Src\$PLASTER_PARAM_ModuleName.psm1'/>
+    <templateFile source='Src\template.psm1' destination='$PLASTER_PARAM_ModuleName\Module\$PLASTER_PARAM_ModuleName.psm1'/>
 
     <message>Building your PowerShell Module, please wait...</message>
     <message> Creating folder and file structure for module: $PLASTER_PARAM_ModuleName </message>
 
-    <file destination='$PLASTER_PARAM_ModuleName\Src\Src\Public\' source='' />
-    <templateFile source='Src\function.ps1' destination='$PLASTER_PARAM_ModuleName\Src\Src\Public\$PLASTER_PARAM_ModuleFunctionName.ps1' />
-    <file destination='$PLASTER_PARAM_ModuleName\Src\Src\Private\' source='' />
-    <templateFile source='.gitkeep' destination='$PLASTER_PARAM_ModuleName\Src\Src\Private\.gitkeep' />
+    <file destination='$PLASTER_PARAM_ModuleName\Module\Src\Public\' source='' />
+    <templateFile source='Src\function.ps1' destination='$PLASTER_PARAM_ModuleName\Module\Src\Public\$PLASTER_PARAM_ModuleFunctionName.ps1' />
+    <file destination='$PLASTER_PARAM_ModuleName\Module\Src\Private\' source='' />
+    <templateFile source='.gitkeep' destination='$PLASTER_PARAM_ModuleName\Module\Src\Private\.gitkeep' />
 
-    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Help"' destination='$PLASTER_PARAM_ModuleName\Src\en-US\' source='' />
-    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Help"' source='Src\about_template.help.txt.ps1' destination='$PLASTER_PARAM_ModuleName\Src\en-US\about_$PLASTER_PARAM_ModuleName.help.txt' />
-    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Classes"' destination='$PLASTER_PARAM_ModuleName\Src\Classes\' source='' />
-    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Classes"' source='Src\template.cs.ps1' destination='$PLASTER_PARAM_ModuleName\Src\Classes\$PLASTER_PARAM_ModuleName.cs.ps1' />
-    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Binaries"' destination='$PLASTER_PARAM_ModuleName\Src\Binaries\' source='' />
-    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Binaries"' source='.gitkeep' destination='$PLASTER_PARAM_ModuleName\Src\Binaries\.gitkeep' />
-    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Examples"' destination='$PLASTER_PARAM_ModuleName\Src\Examples\' source='' />
-    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Manifests"' source='.gitkeep' destination='$PLASTER_PARAM_ModuleName\Src\Config\.gitkeep' />
+    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Help"' destination='$PLASTER_PARAM_ModuleName\Module\en-US\' source='' />
+    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Help"' source='Src\about_template.help.txt.ps1' destination='$PLASTER_PARAM_ModuleName\Module\en-US\about_$PLASTER_PARAM_ModuleName.help.txt' />
+    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Classes"' destination='$PLASTER_PARAM_ModuleName\Module\Classes\' source='' />
+    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Classes"' source='Src\template.cs.ps1' destination='$PLASTER_PARAM_ModuleName\Module\Classes\$PLASTER_PARAM_ModuleName.cs.ps1' />
+    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Binaries"' destination='$PLASTER_PARAM_ModuleName\Module\Binaries\' source='' />
+    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Binaries"' source='.gitkeep' destination='$PLASTER_PARAM_ModuleName\Module\Binaries\.gitkeep' />
+    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Examples"' destination='$PLASTER_PARAM_ModuleName\Module\Examples\' source='' />
+    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Examples"' source='.gitkeep' destination='$PLASTER_PARAM_ModuleName\Module\Examples\.gitkeep' />
 
     <templateFile source='Src\ReadMe.md' destination='$PLASTER_PARAM_ModuleName\ReadMe.md' />
     <templateFile source='build.ps1' destination='$PLASTER_PARAM_ModuleName\build.ps1' />
 
     <message> Building pester tests for: $PLASTER_PARAM_ModuleName </message>
-    <file destination='$PLASTER_PARAM_ModuleName\tests\' source='' />
-    <templateFile source='Test\Manifest.Tests.ps1' destination='$PLASTER_PARAM_ModuleName\tests\Manifest.Tests.ps1'/>
+    <file destination='$PLASTER_PARAM_ModuleName\Tests\' source='' />
+    <templateFile source='Test\Manifest.Tests.ps1' destination='$PLASTER_PARAM_ModuleName\Tests\Manifest.Tests.ps1'/>
 
     <message> Building editor workspace settings for: $PLASTER_PARAM_Editor </message>
     <file condition="($PLASTER_PARAM_Editor -eq 'VSCode')"
