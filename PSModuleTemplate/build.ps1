@@ -1,19 +1,21 @@
 $psake.use_exit_on_error = $true
 properties {
 
-    # [String]$DestinationPath = "~\Documents\"
+    [String]$DeployDestination = "~\Downloads\"
     [String]$Analyze = '.\Module\'
     [String]$Tests = '.\tests\'
-    [String]$moduleName = ((Get-ChildItem .\Module\*.psm1).name -split '\.')[0]
 
 }
 
-task default -depends Clean, Analyze, Test, Build
+task default -depends Clean, Analyze, Test, Build, VersionControl, Deploy
 
 $ParentPath = Split-Path $MyInvocation.MyCommand.Path -Parent
 $Leaf = Split-Path $ParentPath -Leaf
 
-$manifest = Test-ModuleManifest -Path ".\Module\$Leaf.psd1"
+$moduleName = ((Get-ChildItem .\Module\*.psm1).name -split '\.')[0]
+$manifest = Test-ModuleManifest -Path ".\Module\$moduleName.psd1"
+$Build = $Manifest.Version.Build + 1
+[System.Version]$ModuleVersion = "$($Manifest.Version.Major).$($Manifest.Version.Minor).$Build"
 If($manifest.PowerShellVersion -le 5.99){
 
     $PSFolder = 'WindowsPowerShell'
@@ -24,8 +26,72 @@ If($manifest.PowerShellVersion -le 5.99){
 
 }
 
-$DestinationPath = "~\Documents\$PSFolder\Modules\$leaf"
+$DestinationPath = "~\Documents\$PSFolder\Modules\$moduleName"
 $SourcePath = "$ParentPath\Module\"
+
+task deploy {
+
+    Try {
+
+        $ZipFileName = "$moduleName-$ModuleVersion"
+        $ZipFileFullPath = "$DeployDestination\$ZipFileName.zip"
+        $compress = @{
+            Path = "$SourcePath\*"
+            DestinationPath = $ZipFileFullPath
+            CompressionLevel = 'Fastest'
+            Force = $true
+            ErrorAction = 'Stop'
+        }
+        Compress-Archive @compress
+
+        $FileHash = Get-FileHash -Path $ZipFileFullPath -Algorithm SHA512 -ErrorAction Stop
+        New-Item -Path $DeployDestination -ItemType File -Name "$ZipFileName-Checksum.txt" -Value $FileHash.Hash
+
+    } Catch {
+
+        throw $_
+
+    }
+
+}
+
+task VersionControl {
+
+    if($CommitMessage){
+        Try {
+
+            $CommitCode = $true
+            switch -regex (git status){
+                'nothing to commit, working tree clean'{$CommitCode = $false}
+            }
+
+            If($CommitCode){
+
+                Update-ModuleManifest -Path ".\Module\$($moduleName).psd1" -ModuleVersion $ModuleVersion -ErrorAction Stop
+
+                git add .
+                git tag -a "v$ModuleVersion" -m "Version $ModuleVersion"
+                git commit -m "$CommitMessage"
+
+            } else {
+
+                Write-Output "No changes found. Your commit message '$CommitMessage' will not be applied."
+
+            }
+
+        } Catch {
+
+            throw $_
+
+        }
+
+    } else {
+
+        throw 'If you are want to increase the build number include -parameters @{"CommitMessage"="Your commit message";}'
+
+    }
+
+}
 
 task Build {
 
@@ -73,7 +139,7 @@ task Clean {
 
     Try {
 
-        If(Get-Module -Name $moduleName -ListAvailable){
+        If(Get-Module -Name $moduleName){
 
             Remove-Module -Name $moduleName -ErrorAction Stop
 
@@ -105,10 +171,13 @@ task Variables {
         Write-Output "Leaf = $Leaf"
         Write-Output "Parameters = $Parameters"
         Write-Output "moduleName = $moduleName"
+        Write-Output "ModuleVersion = $ModuleVersion"
         Write-Output "PSFolder = $PSFolder"
         Write-Output "PSVersion = $($manifest.PowerShellVersion)"
         Write-Output "DestinationPath = $DestinationPath"
         Write-Output "SourcePath = $SourcePath"
+        Write-Output "DeployDestination = $DeployDestination"
+        Write-Output "CommitMessage = $CommitMessage"
 
     } catch {
 
