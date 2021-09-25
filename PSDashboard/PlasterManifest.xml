@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<plasterManifest schemaVersion="1.1" templateType="Project" xmlns="http://www.microsoft.com/schemas/PowerShell/Plaster/v1">
+
+  <metadata>
+    <name>PSDashboards</name>
+    <id>576597d9-c412-4064-9f98-ad840867d967</id>
+    <version>1.0.0</version>
+    <title>Plaster Template that creates my custom PowerShell Dashboards</title>
+    <description>supports Docker infrastructure</description>
+    <author>Héctor Andrade</author>
+    <tags>Module,Docker</tags>
+  </metadata>
+
+  <parameters>
+    <parameter name="ModuleName" type="text" prompt="Enter the name of your module" />
+    <parameter name="ModuleDesc" type="text" prompt="Brief description on this module" />
+    <parameter name="ModuleVersion" type="text" prompt="Version number" default='0.0.1' />
+    <parameter name="ModuleCompanyName" type="text" prompt="Company name" default='handrade' />
+    <parameter name="ModuleAuthor" type="user-fullname" prompt="Author" default='Héctor Andrade'/>
+    <parameter name="ModuleEmail" type="user-email" prompt="Email" default="andrad_h@hotmail.com"/>
+
+    <parameter name="ModulePowerShellVersion" type="choice" store="text" prompt="Minimum PowerShell version" default="1">
+      <choice label="&amp;5.1" help="Minimum Windows PowerShell Version required is 5.1" value="5.1" />
+      <choice label="&amp;7.1" help="Minimum PowerShell Version required is 7.1 (PowerShell/.Net Standard 2.x Compliant)" value="7.1" />
+    </parameter>
+
+    <parameter name="ModuleFolders" type="multichoice" prompt="Which folders should be created in this module project?" default='0'>
+      <choice label="&amp;Docker" help="Creates a Docker folder within the module root for dockerfile files." value="Docker" />
+      <choice label="&amp;Scripts" help="Create a scripts folder within the module root for non function scripts?" value="Scripts" />
+    </parameter>
+
+    <parameter name="ProjectPester" type="choice" prompt="Include default module manifest pester tests?" default='0'>
+      <choice label="&amp;Yes" help="Adds a pester tests folder with meta tests at the project root" value="Yes" />
+      <choice label="&amp;No" help="Does not add a pester tests folder" value="No" />
+    </parameter>
+
+    <parameter name='Editor' type='choice' prompt='Select a editor for editor integration (or None):' default='1' store='text' >
+      <choice label='&amp;None' help="No editor specified." value="None"/>
+      <choice label='Visual Studio &amp;Code' help="Your editor is Visual Studio Code." value="VSCode"/>
+    </parameter>
+
+    <parameter name='Build' type='choice' prompt='Include build file?' default='1' store='text' >
+      <choice label='&amp;None' help="No build file." value="None"/>
+      <choice label='&amp;Buid' help="Add build file." value="Build"/>
+    </parameter>
+  </parameters>
+
+  <content>
+
+    <!-- Please see file contents for additional tokenization base on Plaster manifest answers. -->
+    <templateFile source='.\src\dashboard.ps1' destination='${PLASTER_PARAM_ModuleName}\src\dashboard.ps1'/>
+
+    <message>&#10;&#10;Scaffolding your PowerShell Module, please stay awesome...&#10;&#10;&#10;</message>
+    <message> Creating your folders for module: $PLASTER_PARAM_ModuleName </message>
+
+    <file condition='$PLASTER_PARAM_ModuleFolders -contains "Docker"' destination='${PLASTER_PARAM_ModuleName}\Docker\' source='' />
+    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Docker"' source='.\docker\local.dockerfile' destination='${PLASTER_PARAM_ModuleName}\Docker\local.dockerfile' />
+    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Docker"' source='.\docker\remote.dockerfile' destination='${PLASTER_PARAM_ModuleName}\Docker\remote.dockerfile' />
+    <file condition='$PLASTER_PARAM_ModuleFolders-contains "Scripts"' destination='${PLASTER_PARAM_ModuleName}\src\Scripts\' source='' />
+    <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Scripts"' source='placeholder.ps1' destination='${PLASTER_PARAM_ModuleName}\src\Scripts\placeholder.ps1' />
+
+    <templateFile source='ReadMe.md' destination='${PLASTER_PARAM_ModuleName}\ReadMe.md' />
+
+    <message> Setting pester settings for: $PLASTER_PARAM_ModuleName </message>
+    <file condition='$PLASTER_PARAM_ProjectPester -eq "Yes"' destination='${PLASTER_PARAM_ModuleName}\tests\' source='' />
+    <templateFile source='.\tests\Acceptance.tests.ps1' destination='${PLASTER_PARAM_ModuleName}\tests\Acceptance.tests.ps1'/>
+    <templateFile source='.\tests\Integration.tests.ps1' destination='${PLASTER_PARAM_ModuleName}\tests\Integration.tests.ps1'/>
+    <templateFile source='.\tests\Unit.tests.ps1' destination='${PLASTER_PARAM_ModuleName}\tests\Unit.tests.ps1'/>
+    <templateFile source='.\tests\ReadMe.md' destination='${PLASTER_PARAM_ModuleName}\tests\ReadMe.md'/>
+
+    <message> Setting editor workspace settings for: $PLASTER_PARAM_Editor </message>
+    <file condition="($PLASTER_PARAM_Editor -eq 'VSCode')"
+      source='editor\VSCode\settings.json'
+      destination='${PLASTER_PARAM_ModuleName}\.vscode\settings.json' />
+
+    <message> Creating VSCode files </message>
+    <file condition="(($PLASTER_PARAM_Editor -eq 'VSCode') -and ($PLASTER_PARAM_ProjectPester -eq 'Yes'))"
+      source='editor\VSCode\tasks.json'
+      destination='${PLASTER_PARAM_ModuleName}\.vscode\tasks.json' />
+
+    <message> Creating Build file </message>
+    <file condition="(($PLASTER_PARAM_Build -eq 'Build'))"
+      source='build.psake.ps1'
+      destination='${PLASTER_PARAM_ModuleName}\build.psake.ps1' />
+
+    <message> Verifying a minimum version of Pester (4.0.3) is installed. </message>
+    <requireModule name="Pester" condition="$PLASTER_PARAM_ProjectPester -eq 'Yes'" minimumVersion="4.0.3"
+        message="Without Pester, you will not be able to run the provided Pester test to validate your module manifest file.`nWithout version 3.4.0, VS Code will not display Pester warnings and errors in the Problems panel."/>
+
+  </content>
+</plasterManifest>

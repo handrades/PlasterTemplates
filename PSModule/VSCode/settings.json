@@ -1,0 +1,11 @@
+{
+    "files.autoSave": "afterDelay",
+    "files.trimFinalNewlines": true,
+    "files.trimTrailingWhitespace": true,
+    "files.defaultLanguage": "powershell",
+    "editor.renderWhitespace": "all",
+    "powershell.codeFormatting.openBraceOnSameLine": false,
+    "powershell.codeFormatting.newLineAfterCloseBrace": true,
+    "powershell.codeFormatting.whitespaceBeforeOpenBrace": false,
+    "powershell.codeFormatting.alignPropertyValuePairs": false
+}
