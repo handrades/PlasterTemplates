@@ -2,7 +2,7 @@ $psake.use_exit_on_error = $true
 
 properties {
 
-    [String]$Container = 'psdashboard'
+    [String]$Container = 'psdashboard'.ToLower()
     $DeployMessage = 'Executed Deploy!'
     $testMessage = 'Executed Test!'
     $cleanMessage = 'Executed Clean!'
@@ -110,7 +110,7 @@ task Clean {
         }
 
         if((docker image ls --format '{{.ID}}\t{{.Repository}}' | Select-String $Container)){
-            docker rmi $((docker image ls --format '{{.ID}}\t{{.Repository}}' | Select-String $Container) | %{($_ -split '\t')[0]})
+            docker rmi $((docker image ls --format '{{.ID}}\t{{.Repository}}' | Select-String $Container) | %{($_ -split '\t')[0]}) -f
         }
 
     } Catch {

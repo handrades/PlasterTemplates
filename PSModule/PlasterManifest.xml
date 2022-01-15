@@ -70,7 +70,7 @@
     <templateFile condition='$PLASTER_PARAM_ModuleFolders -contains "Examples"' source='.gitkeep' destination='$PLASTER_PARAM_ModuleName\Module\Examples\.gitkeep' />
 
     <templateFile source='Src\ReadMe.md' destination='$PLASTER_PARAM_ModuleName\ReadMe.md' />
-    <templateFile source='build.ps1' destination='$PLASTER_PARAM_ModuleName\build.ps1' />
+    <templateFile source='psakefile.ps1' destination='$PLASTER_PARAM_ModuleName\psakefile.ps1' />
 
     <message> Building pester tests for: $PLASTER_PARAM_ModuleName </message>
     <file destination='$PLASTER_PARAM_ModuleName\Tests\' source='' />

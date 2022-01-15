@@ -80,8 +80,8 @@
 
     <message> Creating Build file </message>
     <file condition="(($PLASTER_PARAM_Build -eq 'Build'))"
-      source='build.psake.ps1'
-      destination='${PLASTER_PARAM_ModuleName}\build.psake.ps1' />
+      source='psakefile.ps1'
+      destination='${PLASTER_PARAM_ModuleName}\psakefile.ps1' />
 
     <message> Verifying a minimum version of Pester (4.0.3) is installed. </message>
     <requireModule name="Pester" condition="$PLASTER_PARAM_ProjectPester -eq 'Yes'" minimumVersion="4.0.3"

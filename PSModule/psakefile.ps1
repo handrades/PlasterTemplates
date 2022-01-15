@@ -7,7 +7,8 @@ properties {
 
 }
 
-task default -depends Clean, Analyze, Test, Build, VersionControl, Deploy
+task default -depends Clean, Analyze, Test, Build, VersionControl, DeployLocal
+task deploy2Gallery -depends Clean, Analyze, Test, Build, VersionControl, Deploy2PowerShellGallery
 
 $ParentPath = Split-Path $MyInvocation.MyCommand.Path -Parent
 $Leaf = Split-Path $ParentPath -Leaf
@@ -16,7 +17,6 @@ $moduleName = ((Get-ChildItem .\Module\*.psm1).name -split '\.')[0]
 $manifest = Test-ModuleManifest -Path ".\Module\$moduleName.psd1"
 $Build = $Manifest.Version.Build + 1
 [System.Version]$ModuleVersion = "$($Manifest.Version.Major).$($Manifest.Version.Minor).$Build"
-
 If($manifest.PowerShellVersion -le 5.99){
 
     $PSFolder = 'WindowsPowerShell'
@@ -27,10 +27,25 @@ If($manifest.PowerShellVersion -le 5.99){
 
 }
 
-$DestinationPath = "~\Documents\$PSFolder\Modules\$moduleName"
-$SourcePath = "$ParentPath\Module\"
+$ModulesPath = ($env:PSModulePath -split ';' | Select-String "\\Documents\\$PSFolder\\Modules")[0]
+$DestinationPath = "$ModulesPath\$moduleName"
+$SourcePath = "$ParentPath\Module\*"
 
-task deploy {
+task Deploy2PowerShellGallery {
+
+    try {
+
+        Publish-Module -Name PSExporter -NuGetApiKey $env:powershellgallery -Verbose
+
+    } catch {
+
+        throw $_
+
+    }
+
+}
+
+task deployLocal {
 
     Try {
 
@@ -88,7 +103,7 @@ task VersionControl {
 
     } else {
 
-        throw 'Add "-parameters @{"CommitMessage"="Your commit message";}" If you are want to increase the build number'
+        throw 'If you want to increase the build number include -parameters @{"CommitMessage"="Your commit message";}'
 
     }
 
@@ -98,7 +113,12 @@ task Build {
 
     Try {
 
-        Copy-Item -Path $SourcePath -Destination $DestinationPath -Force -Recurse -ErrorAction Stop
+        if(Test-Path $DestinationPath){
+            Copy-Item -Path $SourcePath -Destination $DestinationPath -Force -Recurse -ErrorAction Stop
+        } else {
+            New-Item -Path $DestinationPath -ItemType Directory
+            Copy-Item -Path $SourcePath -Destination $DestinationPath -Force -Recurse -ErrorAction Stop
+        }
 
     } Catch {
 
